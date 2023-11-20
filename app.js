@@ -8,12 +8,14 @@ const {
 } = require('./errors');
 
 app.use(express.json());
+
+// API topics
 app.get('/api/topics', getTopics);
 
-// Catch 404 for undefined routes
+// 404 for not a path
 app.all('*', handle404Errors);
 
-// Error handling
+// Other error handling
 app.use(handleCustomErrors);
 app.use(handleserverErrors);
 
