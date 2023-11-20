@@ -87,7 +87,6 @@ describe('/api/articles/:article_id', () => {
       .get('/api/articles/not-an-article')
       .expect(400)
       .then((response) => {
-        console.log('---------->', response.body);
         expect(response.body.msg).toBe('bad request');
       });
   });
