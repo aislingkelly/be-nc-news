@@ -54,6 +54,50 @@ describe('/api/topics', () => {
   });
 });
 
+describe('/api/articles', () => {
+  test('GET: 200 sends an array of topic objects the same length as the test data', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length).toBe(13);
+      });
+  });
+
+  test('GET: 200 sent articles have the required proerties', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+          expect(article).not.toHaveProperty('body');
+        });
+      });
+  });
+  test('GET: 200 sends an array of sorted articles by date DESC', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('created_at', {
+          descending: true,
+        });
+      });
+  });
+});
+
 describe('/api/articles/:article_id', () => {
   test('GET:200 sends a single article to the client', () => {
     return request(app)

@@ -10,7 +10,10 @@ const {
   handle404Errors,
   handlePsqlErrors,
 } = require('./errors');
-const { getArticleById } = require('./controllers/articles.controller');
+const {
+  getArticleById,
+  getArticles,
+} = require('./controllers/articles.controller');
 
 app.use(express.json());
 
@@ -22,6 +25,7 @@ app.get('/api/topics', getTopics);
 app.get('/api', getEndpoints);
 
 // Articles endpoints
+app.get('/api/articles', getArticles);
 app.get('/api/articles/:article_id', getArticleById);
 
 // --- Handle Errors --- //
