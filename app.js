@@ -8,7 +8,9 @@ const {
   handleCustomErrors,
   handleserverErrors,
   handle404Errors,
+  handlePsqlErrors,
 } = require('./errors');
+const { getArticleById } = require('./controllers/articles.controller');
 
 app.use(express.json());
 
@@ -19,11 +21,15 @@ app.get('/api/topics', getTopics);
 // Endpoints endpoint//
 app.get('/api', getEndpoints);
 
+// Articles endpoints
+app.get('/api/articles/:article_id', getArticleById);
+
 // --- Handle Errors --- //
 
 // 404 for not a path
 app.all('*', handle404Errors);
 // Other error handling
+app.use(handlePsqlErrors);
 app.use(handleCustomErrors);
 app.use(handleserverErrors);
 
