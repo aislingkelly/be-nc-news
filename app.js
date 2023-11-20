@@ -9,12 +9,15 @@ const {
 
 app.use(express.json());
 
-// API topics
+// --- Endpoints --- //
+
+// Topics endpoint
 app.get('/api/topics', getTopics);
+
+// --- Handle Errors --- //
 
 // 404 for not a path
 app.all('*', handle404Errors);
-
 // Other error handling
 app.use(handleCustomErrors);
 app.use(handleserverErrors);
