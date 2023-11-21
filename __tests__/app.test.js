@@ -183,7 +183,7 @@ describe('/api/articles/:article_id/comments', () => {
         expect(body.comments).toEqual([]);
       });
   });
-  test('GET:404 sends an appropriate status and error message when the article does not exist', () => {
+  test('GET: 404 sends an appropriate status and error message when the article does not exist', () => {
     return request(app)
       .get('/api/articles/99999/comments')
       .expect(404)
@@ -191,7 +191,7 @@ describe('/api/articles/:article_id/comments', () => {
         expect(response.body.msg).toBe('article does not exist');
       });
   });
-  test('GET:400 sends an appropriate status and error message when given an invalid id', () => {
+  test('GET: 400 sends an appropriate status and error message when given an invalid id', () => {
     return request(app)
       .get('/api/articles/katherine/comments')
       .expect(400)
