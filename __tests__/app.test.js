@@ -200,6 +200,7 @@ describe('/api/articles/:article_id/comments', () => {
       });
   });
 
+
   test('POST: 201 inserts a new comment to the db and sends the comment back to the client', () => {
     const newComment = {
       username: 'butter_bridge',
@@ -276,4 +277,5 @@ describe('/api/articles/:article_id/comments', () => {
       });
   });
   // Should check if username exists here or would that be done as part of a log in process?
+
 });
