@@ -91,5 +91,22 @@
         "created_at": "2023-11-21T09:00:00.000Z"
       }
     }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "Updates the vote count of a specific article identified by its unique ID.",
+    "queries": [],
+    "format": "object",
+    "exampleResponse": {
+      "article": {
+        "article_id": 10,
+        "title": "Generic Story Titles are Easier",
+        "body": "But they make it much more difficult to write a body...",
+        "votes": 120,
+        "topic": "philosophy",
+        "author": "gen_writer",
+        "created_at": "2023-01-15T14:30:00.000Z",
+        "comment_count": 5
+      }
+    }
   }
 }

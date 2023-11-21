@@ -156,6 +156,27 @@ describe('/api/articles/:article_id', () => {
         expect(updatedArticle.votes).toBe(-100);
       });
   });
+  test('PATCH:200 sends the updated article to the client', () => {
+    const updateVotesBy = { inc_votes: 99 };
+    return request(app)
+      .patch('/api/articles/1')
+      .send(updateVotesBy)
+      .expect(200)
+      .then((response) => {
+        const expectedObject = {
+          article_id: 1,
+          title: 'Living in the shadow of a great man',
+          topic: 'mitch',
+          author: 'butter_bridge',
+          body: 'I find this existence challenging',
+          created_at: '2020-07-09T20:11:00.000Z',
+          votes: 199,
+          article_img_url:
+            'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+        };
+        expect(response.body.updatedArticle).toEqual(expectedObject);
+      });
+  });
   test('PATCH: 404 sends an appropriate status and error message when given a valid but non-existent id', () => {
     const updateVotesBy = { inc_votes: -200 };
     return request(app)
