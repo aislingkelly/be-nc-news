@@ -22,7 +22,7 @@ exports.selectCommentsByArticleId = (id) => {
     });
 };
 
-exports.insertComment = ({ username, body }, article_id) => {
+exports.insertComment = (username, body, article_id) => {
   if (!body || !username) {
     return Promise.reject({ status: 400, msg: 'bad request' });
   }
