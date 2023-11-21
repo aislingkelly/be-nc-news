@@ -191,4 +191,12 @@ describe('/api/articles/:article_id/comments', () => {
         expect(response.body.msg).toBe('article does not exist');
       });
   });
+  test('GET:400 sends an appropriate status and error message when given an invalid id', () => {
+    return request(app)
+      .get('/api/articles/katherine/comments')
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
 });
