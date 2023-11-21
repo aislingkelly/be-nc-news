@@ -126,12 +126,34 @@ describe('/api/articles/:article_id', () => {
         expect(response.body.msg).toBe('article does not exist');
       });
   });
-  test('GET:400 sends an appropriate status and error message when given an invalid id', () => {
+  test('GET: 400 sends an appropriate status and error message when given an invalid id', () => {
     return request(app)
       .get('/api/articles/not-an-article')
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe('bad request');
+      });
+  });
+  test('PATCH: 200 updates the requested article by increasing votes', () => {
+    const updateVotesBy = { inc_votes: 99 };
+    return request(app)
+      .patch('/api/articles/1')
+      .send(updateVotesBy)
+      .expect(200)
+      .then((response) => {
+        const updatedArticle = response.body.updatedArticle;
+        expect(updatedArticle.votes).toBe(199);
+      });
+  });
+  test('PATCH: 200 updates the requested article by decrementing votes, can go into negative numbers', () => {
+    const updateVotesBy = { inc_votes: -200 };
+    return request(app)
+      .patch('/api/articles/1')
+      .send(updateVotesBy)
+      .expect(200)
+      .then((response) => {
+        const updatedArticle = response.body.updatedArticle;
+        expect(updatedArticle.votes).toBe(-100);
       });
   });
 });

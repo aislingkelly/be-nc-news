@@ -36,3 +36,17 @@ exports.selectArticles = () => {
       return result.rows;
     });
 };
+
+exports.updateArticle = (article_id, inc_votes) => {
+  return db
+    .query(
+      `UPDATE articles
+      SET votes = votes+$2
+      WHERE article_id = $1
+      RETURNING *;`,
+      [article_id, inc_votes]
+    )
+    .then((result) => {
+      return result.rows[0];
+    });
+};

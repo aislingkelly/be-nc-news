@@ -13,6 +13,7 @@ const {
 const {
   getArticleById,
   getArticles,
+  patchArticleById,
 } = require('./controllers/articles.controller');
 const {
   getCommentsByArticleId,
@@ -31,6 +32,7 @@ app.get('/api', getEndpoints);
 // Articles endpoints
 app.get('/api/articles', getArticles);
 app.get('/api/articles/:article_id', getArticleById);
+app.patch('/api/articles/:article_id', patchArticleById);
 
 // Comments endpoints
 app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
