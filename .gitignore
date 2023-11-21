@@ -1,4 +1,4 @@
 node_modules
 .env.*
-playground.sql
-playground.txt
+play.sql
+play.txt

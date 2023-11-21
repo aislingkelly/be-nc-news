@@ -1,51 +1,80 @@
 {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api",
+    "description": "Provides a comprehensive list of all available endpoints in the API, along with their respective descriptions and query options.",
     "queries": [],
     "format": "JSON object",
-    "exampleResponse": {}
+    "exampleResponse": {
+      "endpoints": [
+        {
+          "path": "GET /api/topics",
+          "description": "Retrieves a list of discussion topics.",
+          "queries": [],
+          "format": "array"
+        },
+        {
+          "path": "GET /api/articles",
+          "description": "Fetches a collection of articles with optional filtering by author, topic, sort order, and sort by fields.",
+          "queries": ["author", "topic", "sort_by", "order"],
+          "format": "array"
+        }
+      ]
+    }
   },
   "GET /api/topics": {
-    "description": "serves an array of all topics",
+    "description": "Retrieves an array of all available discussion topics, each with a unique slug and description.",
     "queries": [],
-    "format": "n/a",
+    "format": "array",
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "topics": [
+        { "slug": "sports", "description": "All about sports" },
+        { "slug": "technology", "description": "Latest tech trends" }
+      ]
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles",
+    "description": "Fetches an array of articles, allowing for optional query parameters to filter the results by author, topic, sorting order, and sorting criteria.",
     "queries": ["author", "topic", "sort_by", "order"],
-    "format": "n/a",
+    "format": "array",
     "exampleResponse": {
       "articles": [
         {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": "2018-05-30T15:59:13.341Z",
-          "votes": 0,
-          "comment_count": 6
+          "title": "The Future of Technology",
+          "topic": "technology",
+          "author": "tech_writer",
+          "article_id": 10,
+          "created_at": "2019-06-11T10:00:00.000Z",
+          "votes": 25,
+          "comment_count": 3,
+          "article_img_url": "https://example.com/image10.jpg"
+        },
+        {
+          "title": "Top Sports in 2021",
+          "topic": "sports",
+          "author": "sports_fan",
+          "article_id": 11,
+          "created_at": "2021-04-25T07:20:50.000Z",
+          "votes": 30,
+          "comment_count": 5,
+          "article_img_url": "https://example.com/image11.jpg"
         }
       ]
     }
   },
   "GET /api/articles/:id": {
-    "description": "serves an article of the corresponding id",
+    "description": "Retrieves details of a specific article identified by its unique ID. The response includes article content, metadata, and associated comments.",
     "queries": [],
+    "format": "object",
     "exampleResponse": {
-      "article": [
-        {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": "2018-05-30T15:59:13.341Z",
-          "votes": 0,
-          "comment_count": 6
-        }
-      ]
+      "article": {
+        "title": "Exploring the Ocean Depths",
+        "topic": "science",
+        "author": "deep_sea_explorer",
+        "article_id": 21,
+        "created_at": "2020-08-15T12:35:00.000Z",
+        "votes": 100,
+        "comment_count": 12,
+        "article_img_url": "https://example.com/image21.jpg"
+      }
     }
   }
 }
