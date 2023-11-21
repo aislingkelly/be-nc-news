@@ -10,7 +10,7 @@ beforeEach(() => {
 afterAll(() => db.end());
 
 describe('/api/topics', () => {
-  test('GET: 200 sends an array of topic objects the same length as the test data', () => {
+  test('GET: 200 an array of topic objects the same length as the test data', () => {
     return request(app)
       .get('/api/topics')
       .expect(200)
@@ -19,7 +19,7 @@ describe('/api/topics', () => {
         expect(body.length).toBe(3);
       });
   });
-  test('GET: 200 send the first topic which matches test data', () => {
+  test('GET: 200 the first returned topic matches test data', () => {
     return request(app)
       .get('/api/topics')
       .expect(200)
@@ -30,7 +30,7 @@ describe('/api/topics', () => {
         });
       });
   });
-  test('GET: 200 sends topics which have the properties 1. slug 2.description', () => {
+  test('GET: 200 topics have the properties 1. slug 2.description', () => {
     return request(app)
       .get('/api/topics')
       .expect(200)
@@ -44,7 +44,7 @@ describe('/api/topics', () => {
         });
       });
   });
-  test('GET: 404 send path not found error when endpoint not available', () => {
+  test('GET: 404 endpoint not available', () => {
     return request(app)
       .get('/api/nopenopenope')
       .expect(404)
@@ -55,7 +55,7 @@ describe('/api/topics', () => {
 });
 
 describe('/api/articles', () => {
-  test('GET: 200 sends an array of topic objects the same length as the test data', () => {
+  test('GET: 200 sends an array of article objects the same length as the test data', () => {
     return request(app)
       .get('/api/articles')
       .expect(200)
@@ -129,6 +129,71 @@ describe('/api/articles/:article_id', () => {
   test('GET:400 sends an appropriate status and error message when given an invalid id', () => {
     return request(app)
       .get('/api/articles/not-an-article')
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+});
+
+describe('/api/articles/:article_id/comments', () => {
+  test('GET: 200 sends an array of comments for the given article_id', () => {
+    return request(app)
+      .get('/api/articles/1/comments')
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.comments)).toBe(true);
+        expect(body.comments.length).toBe(11);
+      });
+  });
+
+  test('GET: 200 sent comments have the required proerties', () => {
+    return request(app)
+      .get('/api/articles/1/comments')
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.comments;
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        });
+      });
+  });
+  test('GET: 200 sends an array of sorted comments by date DESC by default', () => {
+    return request(app)
+      .get('/api/articles/1/comments')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toBeSortedBy('created_at', {
+          descending: true,
+        });
+      });
+  });
+  test('GET: 200 sends an empty array if the article exists but there are no associated comments', () => {
+    return request(app)
+      .get('/api/articles/2/comments')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual([]);
+      });
+  });
+  test('GET: 404 sends an appropriate status and error message when the article does not exist', () => {
+    return request(app)
+      .get('/api/articles/99999/comments')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('article does not exist');
+      });
+  });
+  test('GET: 400 sends an appropriate status and error message when given an invalid id', () => {
+    return request(app)
+      .get('/api/articles/katherine/comments')
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe('bad request');
