@@ -10,7 +10,7 @@ beforeEach(() => {
 afterAll(() => db.end());
 
 describe('/api/topics', () => {
-  test('GET: 200 an array of topic objects the same length as the test data', () => {
+  test('GET: 200 sends an array of topic objects the same length as the test data', () => {
     return request(app)
       .get('/api/topics')
       .expect(200)
@@ -19,7 +19,7 @@ describe('/api/topics', () => {
         expect(body.length).toBe(3);
       });
   });
-  test('GET: 200 the first returned topic matches test data', () => {
+  test('GET: 200 send the first topic which matches test data', () => {
     return request(app)
       .get('/api/topics')
       .expect(200)
@@ -30,7 +30,7 @@ describe('/api/topics', () => {
         });
       });
   });
-  test('GET: 200 topics have the properties 1. slug 2.description', () => {
+  test('GET: 200 sends topics which have the properties 1. slug 2.description', () => {
     return request(app)
       .get('/api/topics')
       .expect(200)
@@ -44,7 +44,7 @@ describe('/api/topics', () => {
         });
       });
   });
-  test('GET: 404 endpoint not available', () => {
+  test('GET: 404 send path not found error when endpoint not available', () => {
     return request(app)
       .get('/api/nopenopenope')
       .expect(404)
@@ -86,7 +86,7 @@ describe('/api/articles', () => {
         });
       });
   });
-  test('GET: 200 sends an array of sorted articles by date DESC', () => {
+  test('GET: 200 sends an array of sorted articles by date DESC by default', () => {
     return request(app)
       .get('/api/articles')
       .expect(200)
