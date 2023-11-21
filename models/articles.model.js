@@ -47,6 +47,9 @@ exports.updateArticle = (article_id, inc_votes) => {
       [article_id, inc_votes]
     )
     .then((result) => {
+      if (!result.rows.length) {
+        return Promise.reject({ status: 404, msg: 'article does not exist' });
+      }
       return result.rows[0];
     });
 };

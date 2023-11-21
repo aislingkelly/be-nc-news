@@ -20,6 +20,7 @@ exports.getArticles = (req, res, next) => {
     })
     .catch(next);
 };
+
 exports.patchArticleById = (req, res, next) => {
   const { inc_votes } = req.body;
   const { article_id } = req.params;

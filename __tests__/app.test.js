@@ -156,6 +156,26 @@ describe('/api/articles/:article_id', () => {
         expect(updatedArticle.votes).toBe(-100);
       });
   });
+  test('PATCH: 404 sends an appropriate status and error message when given a valid but non-existent id', () => {
+    const updateVotesBy = { inc_votes: -200 };
+    return request(app)
+      .patch('/api/articles/999')
+      .send(updateVotesBy)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('article does not exist');
+      });
+  });
+  test('PATCH: 400 sends an appropriate status and error message when given an invalid id', () => {
+    const updateVotesBy = { inc_votes: -200 };
+    return request(app)
+      .patch('/api/articles/not-an-article')
+      .send(updateVotesBy)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
 });
 
 describe('/api/articles/:article_id/comments', () => {
