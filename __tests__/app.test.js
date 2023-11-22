@@ -156,9 +156,6 @@ describe('/api/articles/:article_id', () => {
         expect(updatedArticle.votes).toBe(-100);
       });
   });
-  ///////////////////
-  //Refactor to use toMatchObject
-  //////////////////
   test('PATCH: 200 sends the updated article to the client', () => {
     const updateVotesBy = { inc_votes: 99 };
     return request(app)
@@ -375,6 +372,34 @@ describe('/api/articles/:article_id/comments', () => {
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe('bad request');
+      });
+  });
+});
+
+describe('/api/users', () => {
+  test('GET: 200 an array of user objects the same length as the test data', () => {
+    return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body)).toBe(true);
+        expect(body.length).toBe(4);
+      });
+  });
+
+  test('GET: 200 users have the required properties', () => {
+    return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then(({ body }) => {
+        const users = body;
+        users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
       });
   });
 });

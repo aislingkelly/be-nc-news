@@ -93,7 +93,6 @@
         "created_at": "2023-11-21T09:00:00.000Z"
       }
     }
-
   },
   "PATCH /api/articles/:article_id": {
     "description": "Updates the vote count of a specific article identified by its unique ID.",
@@ -111,6 +110,24 @@
         "comment_count": 5
       }
     }
-
+  },
+  "GET /api/users": {
+    "description": "Retrieves an array of all registered users.",
+    "queries": [],
+    "format": "array",
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "user1",
+          "name": "User One",
+          "avatar_url": "https://example.com/avatar1.jpg"
+        },
+        {
+          "username": "user2",
+          "name": "User Two",
+          "avatar_url": "https://example.com/avatar2.jpg"
+        }
+      ]
+    }
   }
 }
