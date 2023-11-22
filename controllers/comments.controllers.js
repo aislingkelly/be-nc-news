@@ -1,6 +1,10 @@
 const { selectArticleById } = require('../models/articles.model');
-const { selectCommentsByArticleId } = require('../models/comments.models');
-selectArticleById;
+const {
+  selectCommentsByArticleId,
+  insertComment,
+} = require('../models/comments.model');
+const { selectUserByUsername } = require('../models/users.model');
+
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
 
@@ -15,6 +19,23 @@ exports.getCommentsByArticleId = (req, res, next) => {
       const comments =
         resolvedPromises[1]; /* comments are the resolved promise of selectCommentsByArticleId(article_id) in commentPromises array*/
       res.status(200).send({ comments });
+    })
+    .catch(next);
+};
+
+exports.postCommentsByArticleId = (req, res, next) => {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
+
+  const commentPromises = [
+    selectArticleById(article_id),
+    insertComment(username, body, article_id),
+  ];
+
+  Promise.all(commentPromises)
+    .then((resolvedPromises) => {
+      const comment = resolvedPromises[1];
+      res.status(201).send({ comment });
     })
     .catch(next);
 };

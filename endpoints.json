@@ -76,5 +76,20 @@
         "article_img_url": "https://example.com/image21.jpg"
       }
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Adds a new comment to a specific article identified by its unique ID.",
+    "queries": [],
+    "format": "object",
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 101,
+        "article_id": 5,
+        "username": "user_example",
+        "body": "This article provides valuable insights!",
+        "votes": 0,
+        "created_at": "2023-11-21T09:00:00.000Z"
+      }
+    }
   }
 }

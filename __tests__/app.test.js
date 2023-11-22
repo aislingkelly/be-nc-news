@@ -99,7 +99,7 @@ describe('/api/articles', () => {
 });
 
 describe('/api/articles/:article_id', () => {
-  test('GET:200 sends a single article to the client', () => {
+  test('GET: 200 sends a single article to the client', () => {
     return request(app)
       .get('/api/articles/1')
       .expect(200)
@@ -118,7 +118,7 @@ describe('/api/articles/:article_id', () => {
         expect(response.body.article).toEqual(expectedObject);
       });
   });
-  test('GET:404 sends an appropriate status and error message when given a valid but non-existent id', () => {
+  test('GET: 404 sends an appropriate status and error message when given a valid but non-existent id', () => {
     return request(app)
       .get('/api/articles/999')
       .expect(404)
@@ -126,7 +126,7 @@ describe('/api/articles/:article_id', () => {
         expect(response.body.msg).toBe('article does not exist');
       });
   });
-  test('GET:400 sends an appropriate status and error message when given an invalid id', () => {
+  test('GET: 400 sends an appropriate status and error message when given an invalid id', () => {
     return request(app)
       .get('/api/articles/not-an-article')
       .expect(400)
@@ -194,6 +194,108 @@ describe('/api/articles/:article_id/comments', () => {
   test('GET: 400 sends an appropriate status and error message when given an invalid id', () => {
     return request(app)
       .get('/api/articles/katherine/comments')
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+
+  test('POST: 201 inserts a new comment to the db and sends the comment back to the client', () => {
+    const newComment = {
+      username: 'butter_bridge',
+      body: 'My lame comment blah blah blah',
+    };
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        const comment = response.body.comment;
+        expect(comment.comment_id).toBe(19);
+        expect(comment.body).toBe('My lame comment blah blah blah');
+        expect(comment.author).toBe('butter_bridge');
+      });
+  });
+  test('POST: 201 inserts a new comment with all the correct fields', () => {
+    const newComment = {
+      username: 'butter_bridge',
+      body: 'My lame comment blah blah blah',
+    };
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        const comment = response.body.comment;
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          article_id: expect.any(Number),
+        });
+      });
+  });
+
+  test('POST: 400 responds with an appropriate status and error message when given an invalid id', () => {
+    const newComment = {
+      username: 'butter_bridge',
+      body: 'My lame comment blah blah blah',
+    };
+    return request(app)
+      .post('/api/articles/katherine/comments')
+      .send(newComment)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+  test('POST: 404 sends an appropriate status and error message when given a valid but non-existent id', () => {
+    const newComment = {
+      username: 'butter_bridge',
+      body: 'My lame comment blah blah blah',
+    };
+    return request(app)
+      .post('/api/articles/999/comments')
+      .send(newComment)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('article does not exist');
+      });
+  });
+  test('POST: 404 sends an appropriate status and error message when user does not exist', () => {
+    const newComment = {
+      username: 'not_today_buddy',
+      body: 'My lame comment blah blah blah',
+    };
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(newComment)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('user does not exist');
+      });
+  });
+  test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no comment body', () => {
+    const newComment = {
+      username: 'butter_bridge',
+    };
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(newComment)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+  test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no comment username', () => {
+    const newComment = {
+      body: 'My lame comment blah blah blah',
+    };
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(newComment)
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe('bad request');
