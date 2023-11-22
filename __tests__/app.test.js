@@ -97,7 +97,33 @@ describe('/api/articles', () => {
       });
   });
 });
-
+describe('/api/articles?topic', () => {
+  test('GET 200: responds only with articles of a given topic', () => {
+    return request(app)
+      .get('/api/articles?topic=mitch')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(12);
+        expect(body.articles[0].topic).toBe('mitch');
+      });
+  });
+  test('GET 400: sends an error when filtering by an invalid topic', () => {
+    return request(app)
+      .get('/api/articles?topic=not_mitch')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request');
+      });
+  });
+  test('GET 404: sends an error when topic is valid but empty', () => {
+    return request(app)
+      .get('/api/articles?topic=technology')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('no matching articles');
+      });
+  });
+});
 describe('/api/articles/:article_id', () => {
   test('GET: 200 sends a single article to the client', () => {
     return request(app)
