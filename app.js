@@ -18,6 +18,7 @@ const {
 const {
   getCommentsByArticleId,
   postCommentsByArticleId,
+  deleteCommentsByCommentId,
 } = require('./controllers/comments.controllers');
 app.use(express.json());
 
@@ -37,6 +38,8 @@ app.patch('/api/articles/:article_id', patchArticleById);
 // Comments endpoints
 app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
 app.post('/api/articles/:article_id/comments', postCommentsByArticleId);
+app.delete('/api/comments/:comment_id', deleteCommentsByCommentId);
+
 // --- Handle Errors --- //
 
 // 404 for not a path
