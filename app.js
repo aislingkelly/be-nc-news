@@ -18,6 +18,7 @@ const {
 const {
   getCommentsByArticleId,
   postCommentsByArticleId,
+  deleteCommentsByCommentId,
 } = require('./controllers/comments.controllers');
 const { getUsers } = require('./controllers/users.controllers');
 
@@ -42,6 +43,8 @@ app.post('/api/articles/:article_id/comments', postCommentsByArticleId);
 
 // Users endpoints
 app.get('/api/users', getUsers);
+
+app.delete('/api/comments/:comment_id', deleteCommentsByCommentId);
 
 // --- Handle Errors --- //
 
