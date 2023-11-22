@@ -197,6 +197,16 @@ describe('/api/articles/:article_id', () => {
         expect(response.body.msg).toBe('bad request');
       });
   });
+  test('PATCH: 400 sends an appropriate status and error message when given invalid input - in_votes not an integer', () => {
+    const updateVotesBy = { inc_votes: 'banana' };
+    return request(app)
+      .patch('/api/articles/1')
+      .send(updateVotesBy)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('invalid vote');
+      });
+  });
 });
 
 describe('/api/articles/:article_id/comments', () => {
