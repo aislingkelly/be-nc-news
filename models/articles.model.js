@@ -36,3 +36,27 @@ exports.selectArticles = () => {
       return result.rows;
     });
 };
+
+exports.updateArticle = (article_id, inc_votes) => {
+  if (!Number.isInteger(inc_votes)) {
+    return Promise.reject({
+      status: 400,
+      msg: 'invalid vote',
+    });
+  }
+
+  return db
+    .query(
+      `UPDATE articles
+      SET votes = votes+$2
+      WHERE article_id = $1
+      RETURNING *;`,
+      [article_id, inc_votes]
+    )
+    .then((result) => {
+      if (!result.rows.length) {
+        return Promise.reject({ status: 404, msg: 'article does not exist' });
+      }
+      return result.rows[0];
+    });
+};
