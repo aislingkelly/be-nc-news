@@ -28,14 +28,13 @@ exports.postCommentsByArticleId = (req, res, next) => {
   const { username, body } = req.body;
 
   const commentPromises = [
-    selectUserByUsername(username),
     selectArticleById(article_id),
     insertComment(username, body, article_id),
   ];
 
   Promise.all(commentPromises)
     .then((resolvedPromises) => {
-      const comment = resolvedPromises[2];
+      const comment = resolvedPromises[1];
       res.status(201).send({ comment });
     })
     .catch(next);

@@ -200,7 +200,6 @@ describe('/api/articles/:article_id/comments', () => {
       });
   });
 
-
   test('POST: 201 inserts a new comment to the db and sends the comment back to the client', () => {
     const newComment = {
       username: 'butter_bridge',
@@ -273,12 +272,12 @@ describe('/api/articles/:article_id/comments', () => {
     return request(app)
       .post('/api/articles/1/comments')
       .send(newComment)
-      .expect(404)
+      .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe('user does not exist');
       });
   });
-  test('POST: 400 responds with an appropriate status and error message when provided with an incomplete request - no comment body', () => {
+  test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no comment body', () => {
     const newComment = {
       username: 'butter_bridge',
     };
@@ -290,7 +289,7 @@ describe('/api/articles/:article_id/comments', () => {
         expect(response.body.msg).toBe('bad request');
       });
   });
-  test('POST: 400 responds with an appropriate status and error message when provided with an incomplete request - no comment username', () => {
+  test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no comment username', () => {
     const newComment = {
       body: 'My lame comment blah blah blah',
     };
@@ -302,6 +301,4 @@ describe('/api/articles/:article_id/comments', () => {
         expect(response.body.msg).toBe('bad request');
       });
   });
-  // Should check if username exists here or would that be done as part of a log in process?
-
 });
