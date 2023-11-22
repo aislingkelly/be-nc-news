@@ -86,11 +86,14 @@
         "comment_id": 101,
         "article_id": 5,
         "username": "user_example",
-        "body": "This is a comment",
+
+        "body": "This article provides valuable insights!",
+
         "votes": 0,
         "created_at": "2023-11-21T09:00:00.000Z"
       }
     }
+
   },
   "PATCH /api/articles/:article_id": {
     "description": "Updates the vote count of a specific article identified by its unique ID.",
@@ -108,5 +111,6 @@
         "comment_count": 5
       }
     }
+
   }
 }
