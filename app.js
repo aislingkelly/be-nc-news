@@ -19,6 +19,8 @@ const {
   getCommentsByArticleId,
   postCommentsByArticleId,
 } = require('./controllers/comments.controllers');
+const { getUsers } = require('./controllers/users.controllers');
+
 app.use(express.json());
 
 // --- Endpoints --- //
@@ -37,6 +39,9 @@ app.patch('/api/articles/:article_id', patchArticleById);
 // Comments endpoints
 app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
 app.post('/api/articles/:article_id/comments', postCommentsByArticleId);
+
+// Users endpoints
+app.get('/api/users', getUsers);
 // --- Handle Errors --- //
 
 // 404 for not a path
