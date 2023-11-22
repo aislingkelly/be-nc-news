@@ -393,7 +393,7 @@ describe('/api/comments/:comment_id', () => {
   });
   test('DELETE: 400 sends an appropriate status and error message when given an invalid id', () => {
     return request(app)
-      .delete('/api/comments/not-a-commeny')
+      .delete('/api/comments/not-a-comment')
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe('bad request');

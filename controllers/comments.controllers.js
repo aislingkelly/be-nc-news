@@ -43,9 +43,6 @@ exports.deleteCommentsByCommentId = (req, res, next) => {
   const { comment_id } = req.params;
   deleteComment(comment_id)
     .then((result) => {
-      if (result.rowCount === 0) {
-        return res.status(404).json({ msg: 'comment does not exist' });
-      }
       res.status(204).send();
     })
     .catch(next);
