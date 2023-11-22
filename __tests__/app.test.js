@@ -156,7 +156,7 @@ describe('/api/articles/:article_id', () => {
         expect(updatedArticle.votes).toBe(-100);
       });
   });
-  test('PATCH:200 sends the updated article to the client', () => {
+  test('PATCH: 200 sends the updated article to the client', () => {
     const updateVotesBy = { inc_votes: 99 };
     return request(app)
       .patch('/api/articles/1')
