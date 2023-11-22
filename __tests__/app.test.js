@@ -156,7 +156,10 @@ describe('/api/articles/:article_id', () => {
         expect(updatedArticle.votes).toBe(-100);
       });
   });
-  test('PATCH:200 sends the updated article to the client', () => {
+  ///////////////////
+  //Refactor to use toMatchObject
+  //////////////////
+  test('PATCH: 200 sends the updated article to the client', () => {
     const updateVotesBy = { inc_votes: 99 };
     return request(app)
       .patch('/api/articles/1')
@@ -369,6 +372,28 @@ describe('/api/articles/:article_id/comments', () => {
     return request(app)
       .post('/api/articles/1/comments')
       .send(newComment)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+});
+
+describe('/api/comments/:comment_id', () => {
+  test('DELETE: 204 deletes the specified team and sends no body back', () => {
+    return request(app).delete('/api/comments/1').expect(204);
+  });
+  test('DELETE: 404 sends an appropriate status and error message when given a non-existent id', () => {
+    return request(app)
+      .delete('/api/comments/99999')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('comment does not exist');
+      });
+  });
+  test('DELETE: 400 sends an appropriate status and error message when given an invalid id', () => {
+    return request(app)
+      .delete('/api/comments/not-a-comment')
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe('bad request');
