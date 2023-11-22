@@ -42,6 +42,7 @@ app.post('/api/articles/:article_id/comments', postCommentsByArticleId);
 
 // Users endpoints
 app.get('/api/users', getUsers);
+
 // --- Handle Errors --- //
 
 // 404 for not a path
