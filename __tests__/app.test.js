@@ -606,7 +606,6 @@ describe('/api/comments/:comment_id', () => {
       .send(updateVotesBy)
       .expect(200)
       .then((response) => {
-        console.log('---------->', response.body.updatedComment);
         const expectedObject = {
           comment_id: 1,
           body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
