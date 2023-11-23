@@ -1,5 +1,13 @@
 const db = require('../db/connection.js');
 
+// select
+//from
+// join
+//where
+//groupby
+//having
+//order by
+// limit
 exports.selectArticleById = (id) => {
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1`, [id])

@@ -215,6 +215,7 @@ describe('/api/articles/:article_id/comments', () => {
       .get('/api/articles/1/comments')
       .expect(200)
       .then(({ body }) => {
+        console.log('---------->', body.comments);
         expect(Array.isArray(body.comments)).toBe(true);
         expect(body.comments.length).toBe(11);
       });
