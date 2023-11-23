@@ -32,7 +32,14 @@ exports.selectArticleById = (id) => {
     });
 };
 
-exports.selectArticles = (topic) => {
+exports.selectArticles = (topic, order, sort_by) => {
+  const validSortByValues = [
+    'created_at',
+    'comment_count',
+    'votes',
+    'article_id',
+  ];
+  const validOrderValues = ['desc', 'asc'];
   const values = [];
   let queryString = `
         SELECT
@@ -56,9 +63,26 @@ exports.selectArticles = (topic) => {
 
   queryString += `
         GROUP BY
-            articles.article_id
-        ORDER BY
-            articles.created_at DESC `;
+            articles.article_id `;
+
+  if (sort_by && !validSortByValues.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: 'bad request' });
+  } else if (order && !validOrderValues.includes(order)) {
+    return Promise.reject({ status: 400, msg: 'bad request' });
+  } else if (sort_by === 'comment_count') {
+    queryString += `ORDER BY COUNT(comments.comment_id) `;
+  } else if (sort_by) {
+    queryString += `ORDER BY articles.${sort_by} `;
+  } else {
+    queryString += `ORDER BY
+            articles.created_at `;
+  }
+
+  if (order) {
+    queryString += `${order} `;
+  } else {
+    queryString += `DESC `;
+  }
 
   return db.query(queryString, values).then((result) => {
     return result.rows;

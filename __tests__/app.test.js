@@ -460,3 +460,94 @@ describe('/api/comments/:comment_id', () => {
       });
   });
 });
+
+////////////Sorting and ordering tests
+
+describe('/api/articles?sort_by=value&order=value', () => {
+  test('GET: 200 sends an array of sorted articles by votes DESC by default', () => {
+    return request(app)
+      .get('/api/articles?sort_by=votes')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('votes', {
+          descending: true,
+        });
+      });
+  });
+  test('GET: 200 sends an array of sorted articles by created_at DESC by default', () => {
+    return request(app)
+      .get('/api/articles?sort_by=created_at')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('created_at', {
+          descending: true,
+        });
+      });
+  });
+  test('GET: 200 sends an array of sorted articles by comment_count DESC by default', () => {
+    return request(app)
+      .get('/api/articles?sort_by=comment_count')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('comment_count', {
+          descending: true,
+        });
+      });
+  });
+  test('GET: 200 sends an array of sorted articles by article_id DESC by default', () => {
+    return request(app)
+      .get('/api/articles?sort_by=article_id')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('article_id', {
+          descending: true,
+        });
+      });
+  });
+  test('GET: 200 sends an array of sorted articles by comment_count ASC by query', () => {
+    return request(app)
+      .get('/api/articles?sort_by=comment_count&order=asc')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('comment_count', {
+          ascending: true,
+        });
+      });
+  });
+  test('GET: 200 sends an array of sorted articles by article_id ASC by query', () => {
+    return request(app)
+      .get('/api/articles?sort_by=article_id&order=asc')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('article_id', {
+          ascending: true,
+        });
+      });
+  });
+  test('GET: 200 sends an array of sorted articles by date default ASC by query', () => {
+    return request(app)
+      .get('/api/articles?order=asc')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('created_at', {
+          ascending: true,
+        });
+      });
+  });
+  test('GET: 400 bad request if sort_by option does not exist', () => {
+    return request(app)
+      .get('/api/articles?sort_by=banana')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request');
+      });
+  });
+  test('GET: 400 bad request if order value does not exist', () => {
+    return request(app)
+      .get('/api/articles?order=banana')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request');
+      });
+  });
+});
