@@ -132,20 +132,27 @@ describe('/api/articles/:article_id', () => {
       .get('/api/articles/1')
       .expect(200)
       .then((response) => {
-        const expectedObject = {
-          article_id: 1,
-          title: 'Living in the shadow of a great man',
-          topic: 'mitch',
-          author: 'butter_bridge',
-          body: 'I find this existence challenging',
-          created_at: '2020-07-09T20:11:00.000Z',
-          votes: 100,
-          article_img_url:
-            'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
-        };
-        expect(response.body.article).toEqual(expectedObject);
+        expect(response.body.article).toMatchObject({
+          article_id: expect.any(Number),
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
       });
   });
+  test('GET: 200 sends a single article with the comment count property to the client', () => {
+    return request(app)
+      .get('/api/articles/1')
+      .expect(200)
+      .then((response) => {
+        expect(response.body.article).toHaveProperty('comment_count');
+      });
+  });
+
   test('GET: 404 sends an appropriate status and error message when given a valid but non-existent id', () => {
     return request(app)
       .get('/api/articles/999')

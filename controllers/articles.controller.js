@@ -7,12 +7,10 @@ const { checkTopicExists } = require('../models/topics.model');
 
 exports.getArticles = (req, res, next) => {
   const { topic } = req.query;
-
   const articlePromises = [selectArticles(topic)];
   if (topic) {
     articlePromises.push(checkTopicExists(topic));
   }
-
   Promise.all(articlePromises)
     .then((resolvedPromises) => {
       const articles = resolvedPromises[0];
@@ -39,12 +37,3 @@ exports.patchArticleById = (req, res, next) => {
     })
     .catch(next);
 };
-
-// exports.getArticles = (req, res, next) => {
-//   const { topic } = req.query;
-//   selectArticles(topic)
-//     .then((articles) => {
-//       res.status(200).send({ articles });
-//     })
-//     .catch(next);
-// };
