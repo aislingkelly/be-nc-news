@@ -10,7 +10,7 @@ beforeEach(() => {
 afterAll(() => db.end());
 
 describe('/api/topics', () => {
-  test('GET: 200 an array of topic objects the same length as the test data', () => {
+  test.only('GET: 200 an array of topic objects the same length as the test data', () => {
     return request(app)
       .get('/api/topics')
       .expect(200)
