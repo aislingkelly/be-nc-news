@@ -421,7 +421,6 @@ describe('/api/users', () => {
         expect(body.length).toBe(4);
       });
   });
-
   test('GET: 200 users have the required properties', () => {
     return request(app)
       .get('/api/users')
@@ -435,6 +434,31 @@ describe('/api/users', () => {
             avatar_url: expect.any(String),
           });
         });
+      });
+  });
+});
+
+describe('/api/users/:username', () => {
+  test('GET: 200 user has the required properties', () => {
+    return request(app)
+      .get('/api/users/lurker')
+      .expect(200)
+      .then(({ body }) => {
+        const users = body;
+        expect(users).toMatchObject({
+          username: 'lurker',
+          name: 'do_nothing',
+          avatar_url:
+            'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+        });
+      });
+  });
+  test('GET 404: sends an error when user does not exists', () => {
+    return request(app)
+      .get('/api/users/lurkering')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('user does not exist');
       });
   });
 });
@@ -548,6 +572,79 @@ describe('/api/articles?sort_by=value&order=value', () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe('bad request');
+      });
+  });
+});
+
+describe('/api/comments/:comment_id', () => {
+  test('PATCH: 200 updates the requested comment by increasing votes', () => {
+    const updateVotesBy = { inc_votes: 10 };
+    return request(app)
+      .patch('/api/comments/1')
+      .send(updateVotesBy)
+      .expect(200)
+      .then((response) => {
+        const updatedComment = response.body.updatedComment;
+        expect(updatedComment.votes).toBe(26);
+      });
+  });
+  test('PATCH: 200 updates the requested comment by decrementing votes, can go into negative numbers', () => {
+    const updateVotesBy = { inc_votes: -100 };
+    return request(app)
+      .patch('/api/comments/1')
+      .send(updateVotesBy)
+      .expect(200)
+      .then((response) => {
+        const updatedComment = response.body.updatedComment;
+        expect(updatedComment.votes).toBe(-84);
+      });
+  });
+  test('PATCH: 200 sends the updated comment to the client', () => {
+    const updateVotesBy = { inc_votes: 99 };
+    return request(app)
+      .patch('/api/comments/1')
+      .send(updateVotesBy)
+      .expect(200)
+      .then((response) => {
+        const expectedObject = {
+          comment_id: 1,
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          article_id: 9,
+          author: 'butter_bridge',
+          votes: 115,
+          created_at: '2020-04-06T12:17:00.000Z',
+        };
+        expect(response.body.updatedComment).toEqual(expectedObject);
+      });
+  });
+  test('PATCH: 404 sends an appropriate status and error message when given a valid but non-existent id', () => {
+    const updateVotesBy = { inc_votes: -200 };
+    return request(app)
+      .patch('/api/comments/999')
+      .send(updateVotesBy)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('comment does not exist');
+      });
+  });
+  test('PATCH: 400 sends an appropriate status and error message when given an invalid id', () => {
+    const updateVotesBy = { inc_votes: -200 };
+    return request(app)
+      .patch('/api/comments/not-an-comment')
+      .send(updateVotesBy)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+  test('PATCH: 400 sends an appropriate status and error message when given invalid input - in_votes not an integer', () => {
+    const updateVotesBy = { inc_votes: 'banana' };
+    return request(app)
+      .patch('/api/comments/1')
+      .send(updateVotesBy)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('invalid vote');
       });
   });
 });

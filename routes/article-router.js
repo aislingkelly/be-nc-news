@@ -8,11 +8,13 @@ const {
   postCommentsByArticleId,
 } = require('../controllers/articles.controller');
 
-// Articles endpoints
 router.get('/', getArticles);
-router.get('/:article_id', getArticleById);
-router.patch('/:article_id', patchArticleById);
-router.get('/:article_id/comments', getCommentsByArticleId);
-router.post('/:article_id/comments', postCommentsByArticleId);
+
+router.route('/:article_id').get(getArticleById).patch(patchArticleById);
+
+router
+  .route('/:article_id/comments')
+  .get(getCommentsByArticleId)
+  .post(postCommentsByArticleId);
 
 module.exports = router;
