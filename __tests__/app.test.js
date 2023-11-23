@@ -103,24 +103,26 @@ describe('/api/articles?topic', () => {
       .get('/api/articles?topic=mitch')
       .expect(200)
       .then(({ body }) => {
+        body.articles.forEach((article) => {
+          expect(article.topic).toBe('mitch');
+        });
         expect(body.articles.length).toBe(12);
-        expect(body.articles[0].topic).toBe('mitch');
       });
   });
-  test('GET 400: sends an error when filtering by an invalid topic', () => {
+  test('GET 404: sends an error when topic does not exists', () => {
     return request(app)
       .get('/api/articles?topic=not_mitch')
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('bad request');
-      });
-  });
-  test('GET 404: sends an error when topic is valid but empty', () => {
-    return request(app)
-      .get('/api/articles?topic=technology')
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('no matching articles');
+        expect(body.msg).toBe('not a valid topic');
+      });
+  });
+  test('GET 200: responds with an empty array if there are no articles associated with topic', () => {
+    return request(app)
+      .get('/api/articles?topic=paper')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toEqual([]);
       });
   });
 });

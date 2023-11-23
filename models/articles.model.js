@@ -12,10 +12,9 @@ exports.selectArticleById = (id) => {
 };
 
 exports.selectArticles = (topic) => {
-  const validFilterValues = ['mitch', 'cats', 'technology'];
   const values = [];
-
-  let queryString = `SELECT
+  let queryString = `
+        SELECT
             articles.author,
             articles.title,
             articles.article_id,
@@ -26,57 +25,24 @@ exports.selectArticles = (topic) => {
         CAST(COUNT(comments.comment_id) AS INTEGER) AS comment_count
         FROM
             articles
-        LEFT JOIN comments 
+        LEFT JOIN comments
             ON articles.article_id = comments.article_id `;
 
-  if (topic && !validFilterValues.includes(topic)) {
-    return Promise.reject({ status: 400, msg: 'bad request' });
-  } else if (topic) {
+  if (topic) {
     queryString += `WHERE topic = $1 `;
     values.push(topic);
   }
 
-  queryString += `GROUP BY
+  queryString += `
+        GROUP BY
             articles.article_id
-        ORDER BY  
+        ORDER BY
             articles.created_at DESC `;
 
   return db.query(queryString, values).then((result) => {
-    if (result.rowCount === 0) {
-      return Promise.reject({
-        status: 404,
-        msg: `no matching articles`,
-      });
-    }
     return result.rows;
   });
 };
-
-// exports.selectArticles = () => {
-//   return db
-//     .query(
-//       `SELECT
-//             articles.author,
-//             articles.title,
-//             articles.article_id,
-//             articles.topic,
-//             articles.created_at,
-//             articles.votes,
-//             articles.article_img_url,
-//         CAST(COUNT(comments.comment_id) AS INTEGER) AS comment_count
-//         FROM
-//             articles
-//         LEFT JOIN comments
-//             ON articles.article_id = comments.article_id
-//         GROUP BY
-//             articles.article_id
-//         ORDER BY
-//             articles.created_at DESC`
-//     )
-//     .then((result) => {
-//       return result.rows;
-//     });
-// };
 
 exports.updateArticle = (article_id, inc_votes) => {
   if (!Number.isInteger(inc_votes)) {
