@@ -32,15 +32,15 @@
     }
   },
   "GET /api/articles": {
-    "description": "Fetches an array of articles, allowing for optional query parameters to filter the results by author, topic, sorting order, and sorting criteria.",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "Fetches an array of articles, allowing for optional query parameters to filter the results by author, topic, sorting order, and sorting criteria. When the 'topic' query is provided, it filters the articles by the specified topic value. The default order is by article creation date, descending",
+    "queries": ["topic"],
     "format": "array",
     "exampleResponse": {
       "articles": [
         {
-          "title": "The Future of Technology",
-          "topic": "technology",
-          "author": "tech_writer",
+          "title": "Not Really About Mitch...Or Is It?",
+          "topic": "not mitch",
+          "author": "not_a_mitch_writer",
           "article_id": 10,
           "created_at": "2019-06-11T10:00:00.000Z",
           "votes": 25,
@@ -48,14 +48,14 @@
           "article_img_url": "https://example.com/image10.jpg"
         },
         {
-          "title": "Top Sports in 2021",
-          "topic": "sports",
-          "author": "sports_fan",
-          "article_id": 11,
-          "created_at": "2021-04-25T07:20:50.000Z",
-          "votes": 30,
-          "comment_count": 5,
-          "article_img_url": "https://example.com/image11.jpg"
+          "title": "This Mitch Guy, He Gets Around",
+          "topic": "mitch",
+          "author": "mitch_fan",
+          "article_id": 20,
+          "created_at": "2021-05-22T14:15:30.000Z",
+          "votes": 40,
+          "comment_count": 7,
+          "article_img_url": "https://example.com/image20.jpg"
         }
       ]
     }

@@ -97,7 +97,35 @@ describe('/api/articles', () => {
       });
   });
 });
-
+describe('/api/articles?topic', () => {
+  test('GET 200: responds only with articles of a given topic', () => {
+    return request(app)
+      .get('/api/articles?topic=mitch')
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          expect(article.topic).toBe('mitch');
+        });
+        expect(body.articles.length).toBe(12);
+      });
+  });
+  test('GET 404: sends an error when topic does not exists', () => {
+    return request(app)
+      .get('/api/articles?topic=not_mitch')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('not a valid topic');
+      });
+  });
+  test('GET 200: responds with an empty array if there are no articles associated with topic', () => {
+    return request(app)
+      .get('/api/articles?topic=paper')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toEqual([]);
+      });
+  });
+});
 describe('/api/articles/:article_id', () => {
   test('GET: 200 sends a single article to the client', () => {
     return request(app)
