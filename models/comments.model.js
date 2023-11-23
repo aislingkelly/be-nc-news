@@ -1,3 +1,5 @@
+const db = require('../db/connection.js');
+
 exports.selectCommentsByArticleId = (id) => {
   return db
     .query(

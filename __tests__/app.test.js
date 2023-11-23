@@ -10,7 +10,7 @@ beforeEach(() => {
 afterAll(() => db.end());
 
 describe('/api/topics', () => {
-  test.only('GET: 200 an array of topic objects the same length as the test data', () => {
+  test('GET: 200 an array of topic objects the same length as the test data', () => {
     return request(app)
       .get('/api/topics')
       .expect(200)
@@ -142,6 +142,7 @@ describe('/api/articles/:article_id', () => {
           votes: 100,
           article_img_url:
             'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+          comment_count: 11,
         };
         expect(response.body.article).toEqual(expectedObject);
       });
@@ -243,7 +244,6 @@ describe('/api/articles/:article_id/comments', () => {
       .get('/api/articles/1/comments')
       .expect(200)
       .then(({ body }) => {
-        console.log('---------->', body.comments);
         expect(Array.isArray(body.comments)).toBe(true);
         expect(body.comments.length).toBe(11);
       });
