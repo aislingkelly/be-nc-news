@@ -4,8 +4,8 @@ const {
   selectCommentsByArticleId,
   insertComment,
   deleteComment,
+  updateComment,
 } = require('../models/comments.model');
-const { selectUserByUsername } = require('../models/users.model');
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
@@ -44,6 +44,16 @@ exports.deleteCommentsByCommentId = (req, res, next) => {
   deleteComment(comment_id)
     .then((result) => {
       res.status(204).send();
+    })
+    .catch(next);
+};
+
+exports.patchCommentsById = (req, res, next) => {
+  const { inc_votes } = req.body;
+  const { comment_id } = req.params;
+  updateComment(comment_id, inc_votes)
+    .then((updatedComment) => {
+      res.status(200).send({ updatedComment });
     })
     .catch(next);
 };
