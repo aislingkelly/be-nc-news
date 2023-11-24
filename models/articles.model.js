@@ -32,7 +32,13 @@ exports.selectArticleById = (id) => {
     });
 };
 
-exports.selectArticles = (topic, order, sort_by) => {
+exports.selectArticles = (
+  topic,
+  order = 'desc',
+  sort_by,
+  limit = 10,
+  p = 1
+) => {
   const validSortByValues = [
     'created_at',
     'comment_count',
@@ -42,46 +48,60 @@ exports.selectArticles = (topic, order, sort_by) => {
   const validOrderValues = ['desc', 'asc'];
   const values = [];
   let queryString = `
-        SELECT
-            articles.author,
-            articles.title,
-            articles.article_id,
-            articles.topic,
-            articles.created_at,
-            articles.votes,
-            articles.article_img_url,
+WITH row_count AS (
+    SELECT
+        CAST(COUNT(*) OVER() AS INTEGER) AS total_count,
+        articles.author,
+        articles.title,
+        articles.article_id,
+        articles.topic,
+        articles.created_at,
+        articles.votes,
+        articles.article_img_url,
         CAST(COUNT(comments.comment_id) AS INTEGER) AS comment_count
-        FROM
-            articles
-        LEFT JOIN comments
-            ON articles.article_id = comments.article_id `;
+    FROM
+        articles
+    LEFT JOIN comments
+        ON articles.article_id = comments.article_id `;
 
   if (topic) {
-    queryString += `WHERE topic = $1 `;
     values.push(topic);
+    queryString += `WHERE topic = $1 `;
   }
 
   queryString += `
         GROUP BY
             articles.article_id `;
 
+  queryString += `)
+SELECT 
+    *, 
+    (SELECT total_count FROM row_count LIMIT 1) as total_count
+FROM row_count `;
+
   if (sort_by && !validSortByValues.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: 'bad request' });
   } else if (order && !validOrderValues.includes(order)) {
     return Promise.reject({ status: 400, msg: 'bad request' });
-  } else if (sort_by === 'comment_count') {
-    queryString += `ORDER BY COUNT(comments.comment_id) `;
   } else if (sort_by) {
-    queryString += `ORDER BY articles.${sort_by} `;
+    queryString += `ORDER BY ${sort_by} `;
   } else {
     queryString += `ORDER BY
-            articles.created_at `;
+            created_at `;
   }
 
-  if (order) {
-    queryString += `${order} `;
+  queryString += `${order} `;
+  if (!isNaN(Number(limit))) {
+    queryString += `LIMIT ${limit} `;
   } else {
-    queryString += `DESC `;
+    return Promise.reject({ status: 400, msg: 'bad request' });
+  }
+
+  if (!isNaN(Number(p))) {
+    p = (p - 1) * limit;
+    queryString += `OFFSET ${p} `;
+  } else {
+    return Promise.reject({ status: 400, msg: 'bad request' });
   }
 
   return db.query(queryString, values).then((result) => {

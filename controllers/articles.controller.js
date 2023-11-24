@@ -10,8 +10,8 @@ const {
 const { checkTopicExists } = require('../models/topics.model');
 
 exports.getArticles = (req, res, next) => {
-  const { sort_by, order, topic } = req.query;
-  const articlePromises = [selectArticles(topic, order, sort_by)];
+  const { sort_by, order, topic, limit, p } = req.query;
+  const articlePromises = [selectArticles(topic, order, sort_by, limit, p)];
   if (topic) {
     articlePromises.push(checkTopicExists(topic));
   }
