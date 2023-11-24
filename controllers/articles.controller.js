@@ -5,7 +5,9 @@ const {
   selectCommentsByArticleId,
   insertComment,
   insertArticle,
+  deleteArticle,
 } = require('../models/articles.model');
+const { deleteCommentsByArticleId } = require('../models/comments.model');
 
 const { checkTopicExists } = require('../models/topics.model');
 
@@ -81,6 +83,16 @@ exports.postArticle = (req, res, next) => {
   insertArticle(author, title, body, topic, article_img_url)
     .then((article) => {
       res.status(201).send({ article });
+    })
+    .catch(next);
+};
+
+exports.deleteArticleById = (req, res, next) => {
+  const { article_id } = req.params;
+  deleteCommentsByArticleId(article_id)
+    .then(() => deleteArticle(article_id))
+    .then(() => {
+      res.status(204).send();
     })
     .catch(next);
 };
