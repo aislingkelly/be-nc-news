@@ -18,6 +18,7 @@ exports.getArticles = (req, res, next) => {
   Promise.all(articlePromises)
     .then((resolvedPromises) => {
       const articles = resolvedPromises[0];
+
       res.status(200).send({ articles });
     })
     .catch(next);

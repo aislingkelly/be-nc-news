@@ -168,6 +168,17 @@
       }
     }
   },
+  "POST /api/topics": {
+    "description": "Adds a new discussion topic to the API. This endpoint allows for the creation of new topics that can be used to categorize articles and discussions. The request body must contain an object with 'slug' and 'description' properties, which represent the name and description of the new topic respectively.",
+    "queries": [],
+    "format": "object",
+    "exampleResponse": {
+      "topic": {
+        "slug": "environmental_science",
+        "description": "A discussion forum for the latest research and developments in environmental science."
+      }
+    }
+  },
   "PATCH /api/articles/:article_id": {
     "description": "Updates the vote count of a specific article identified by its unique ID.",
     "queries": [],
