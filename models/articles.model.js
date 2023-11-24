@@ -32,84 +32,6 @@ exports.selectArticleById = (id) => {
     });
 };
 
-exports.selectArticles = (
-  topic,
-  order = 'desc',
-  sort_by,
-  limit = 10,
-  p = 1
-) => {
-  const validSortByValues = [
-    'created_at',
-    'comment_count',
-    'votes',
-    'article_id',
-  ];
-  const validOrderValues = ['desc', 'asc'];
-  const values = [];
-  let queryString = `
-WITH row_count AS (
-    SELECT
-        CAST(COUNT(*) OVER() AS INTEGER) AS total_count,
-        articles.author,
-        articles.title,
-        articles.article_id,
-        articles.topic,
-        articles.created_at,
-        articles.votes,
-        articles.article_img_url,
-        CAST(COUNT(comments.comment_id) AS INTEGER) AS comment_count
-    FROM
-        articles
-    LEFT JOIN comments
-        ON articles.article_id = comments.article_id `;
-
-  if (topic) {
-    values.push(topic);
-    queryString += `WHERE topic = $1 `;
-  }
-
-  queryString += `
-        GROUP BY
-            articles.article_id `;
-
-  queryString += `)
-SELECT 
-    *, 
-    (SELECT total_count FROM row_count LIMIT 1) as total_count
-FROM row_count `;
-
-  if (sort_by && !validSortByValues.includes(sort_by)) {
-    return Promise.reject({ status: 400, msg: 'bad request' });
-  } else if (order && !validOrderValues.includes(order)) {
-    return Promise.reject({ status: 400, msg: 'bad request' });
-  } else if (sort_by) {
-    queryString += `ORDER BY ${sort_by} `;
-  } else {
-    queryString += `ORDER BY
-            created_at `;
-  }
-
-  queryString += `${order} `;
-
-  if (!isNaN(Number(limit))) {
-    queryString += `LIMIT ${limit} `;
-  } else {
-    return Promise.reject({ status: 400, msg: 'bad request' });
-  }
-
-  if (!isNaN(Number(p))) {
-    p = (p - 1) * limit;
-    queryString += `OFFSET ${p} `;
-  } else {
-    return Promise.reject({ status: 400, msg: 'bad request' });
-  }
-
-  return db.query(queryString, values).then((result) => {
-    return result.rows;
-  });
-};
-
 exports.updateArticle = (article_id, inc_votes) => {
   if (!Number.isInteger(inc_votes)) {
     return Promise.reject({
@@ -232,4 +154,66 @@ exports.deleteArticle = (article_id) => {
         });
       }
     });
+};
+
+exports.selectArticles = (
+  topic,
+  order = 'desc',
+  sort_by,
+  limit = 10,
+  p = 1
+) => {
+  const validSortByValues = [
+    'created_at',
+    'comment_count',
+    'votes',
+    'article_id',
+  ];
+  const validOrderValues = ['desc', 'asc'];
+
+  if (
+    (sort_by && !validSortByValues.includes(sort_by)) ||
+    !validOrderValues.includes(order) ||
+    isNaN(Number(limit)) ||
+    isNaN(Number(p))
+  ) {
+    return Promise.reject({ status: 400, msg: 'bad request' });
+  }
+
+  p = (p - 1) * limit;
+
+  let countQuery = `SELECT COUNT(*) AS total_count FROM articles`;
+  const values = [];
+
+  if (topic) {
+    countQuery += ` WHERE topic = $1`;
+    values.push(topic);
+  }
+
+  return db.query(countQuery, values).then((countResult) => {
+    const totalCount = countResult.rows[0].total_count;
+
+    let articlesQuery = `SELECT author, title, article_id, topic, created_at, votes, article_img_url, 
+      CAST((SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) AS comment_count
+      FROM articles`;
+
+    if (topic) {
+      articlesQuery += ` WHERE topic = $1`;
+    }
+
+    if (sort_by) {
+      articlesQuery += ` ORDER BY ${sort_by} ${order}`;
+    } else {
+      articlesQuery += ` ORDER BY created_at ${order}`;
+    }
+
+    articlesQuery += ` LIMIT ${limit} OFFSET ${p}`;
+
+    return db.query(articlesQuery, values).then((articlesResult) => {
+      return {
+        articles: articlesResult.rows,
+        total_count: Number(totalCount),
+      };
+    });
+  });
 };
