@@ -415,7 +415,7 @@ describe('/api/articles/:article_id/comments', () => {
       .expect(200)
       .then(({ body }) => {
         expect(Array.isArray(body.comments)).toBe(true);
-        expect(body.comments.length).toBe(11);
+        expect(body.comments.length).toBe(10);
       });
   });
 
@@ -573,6 +573,47 @@ describe('/api/articles/:article_id/comments', () => {
         expect(response.body.msg).toBe('bad request');
       });
   });
+  test('GET: 200 sends an array comments limited to limit', () => {
+    return request(app)
+      .get('/api/articles/1/comments?limit=6')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(6);
+      });
+  });
+
+  test('GET: 400 bad request if limit is not a number', () => {
+    return request(app)
+      .get('/api/articles/1/comments?limit=banana')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request');
+      });
+  });
+  test('GET: 400 bad request if p is not a number', () => {
+    return request(app)
+      .get('/api/articles/1/comments?p=banana')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request');
+      });
+  });
+  test('GET: 200 sends an array comments limited to limit and on page p', () => {
+    return request(app)
+      .get('/api/articles/1/comments?limit=3&p=3')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(3);
+      });
+  });
+  test('GET: 200 sends an array comments limited to limit and on page p - the last page has fewer results', () => {
+    return request(app)
+      .get('/api/articles/1/comments?limit=3&p=4')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(2);
+      });
+  });
 });
 
 describe('/api/users', () => {
@@ -617,7 +658,7 @@ describe('/api/users/:username', () => {
         });
       });
   });
-  test('GET 404: sends an error when user does not exists', () => {
+  test('GET: 404 sends an error when user does not exists', () => {
     return request(app)
       .get('/api/users/lurkering')
       .expect(404)
@@ -626,30 +667,6 @@ describe('/api/users/:username', () => {
       });
   });
 });
-
-describe('/api/comments/:comment_id', () => {
-  test('DELETE: 204 deletes the specified team and sends no body back', () => {
-    return request(app).delete('/api/comments/1').expect(204);
-  });
-  test('DELETE: 404 sends an appropriate status and error message when given a non-existent id', () => {
-    return request(app)
-      .delete('/api/comments/99999')
-      .expect(404)
-      .then((response) => {
-        expect(response.body.msg).toBe('comment does not exist');
-      });
-  });
-  test('DELETE: 400 sends an appropriate status and error message when given an invalid id', () => {
-    return request(app)
-      .delete('/api/comments/not-a-comment')
-      .expect(400)
-      .then((response) => {
-        expect(response.body.msg).toBe('bad request');
-      });
-  });
-});
-
-////////////Sorting and ordering tests
 
 describe('/api/articles?sort_by=value&order=value', () => {
   test('GET: 200 sends an array of sorted articles by votes DESC by default', () => {
@@ -740,7 +757,6 @@ describe('/api/articles?sort_by=value&order=value', () => {
   });
 });
 
-/////// Limit and page
 describe('/api/articles?limit=value&p=value', () => {
   test('GET: 200 sends an array articles limited to limit', () => {
     return request(app)
@@ -829,17 +845,7 @@ describe('/api/articles?limit=value&p=value', () => {
         });
       });
   });
-
-  // test('GET: 400 bad request if limit is not a number', () => {
-  //   return request(app)
-  //     .get('/api/articles?limit=banana')
-  //     .expect(400)
-  //     .then(({ body }) => {
-  //       expect(body.msg).toBe('bad request');
-  //     });
 });
-
-////////////////////// Limit and page
 
 describe('/api/comments/:comment_id', () => {
   test('PATCH: 200 updates the requested comment by increasing votes', () => {
@@ -910,6 +916,25 @@ describe('/api/comments/:comment_id', () => {
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe('invalid vote');
+      });
+  });
+  test('DELETE: 204 deletes the specified comment and sends no body back', () => {
+    return request(app).delete('/api/comments/1').expect(204);
+  });
+  test('DELETE: 404 sends an appropriate status and error message when given a non-existent id', () => {
+    return request(app)
+      .delete('/api/comments/99999')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('comment does not exist');
+      });
+  });
+  test('DELETE: 400 sends an appropriate status and error message when given an invalid id', () => {
+    return request(app)
+      .delete('/api/comments/not-a-comment')
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
       });
   });
 });

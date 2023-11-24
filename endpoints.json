@@ -32,30 +32,32 @@
     }
   },
   "GET /api/articles": {
-    "description": "Fetches an array of articles, allowing for optional query parameters to filter the results by author, topic, and sorting criteria. The 'sort_by' query allows sorting by any valid article column, defaulting to 'created_at' date. The 'order' query can be 'asc' or 'desc', defaulting to descending order. When the 'topic' query is provided, it filters the articles by the specified topic.",
-    "queries": ["author", "topic", "sort_by", "order"],
-    "format": "array",
+    "description": "Fetches an array of articles, allowing for optional query parameters to filter the results by author, topic, and sorting criteria. Additionally, supports pagination to handle large data sets efficiently. The 'sort_by' query allows sorting by any valid article column, defaulting to 'created_at' date. The 'order' query can be 'asc' or 'desc', defaulting to descending order. When the 'topic' query is provided, it filters the articles by the specified topic. Pagination is achieved through 'limit' and 'p' queries, where 'limit' sets the number of articles per page (defaulting to 10), and 'p' specifies the page number.",
+    "queries": ["author", "topic", "sort_by", "order", "limit", "p"],
+    "format": "object",
     "exampleResponse": {
       "articles": [
         {
-          "title": "Not Really About Mitch...Or Is It?",
-          "topic": "not mitch",
-          "author": "not_a_mitch_writer",
-          "article_id": 10,
-          "created_at": "2019-06-11T10:00:00.000Z",
-          "votes": 25,
-          "comment_count": 3,
-          "article_img_url": "https://example.com/image10.jpg"
+          "title": "Exploring the Urban Jungle",
+          "topic": "city_life",
+          "author": "urban_explorer",
+          "article_id": 30,
+          "created_at": "2022-07-19T16:45:00.000Z",
+          "votes": 15,
+          "comment_count": 2,
+          "article_img_url": "https://example.com/image30.jpg",
+          "total_count": 50
         },
         {
-          "title": "This Mitch Guy, He Gets Around",
-          "topic": "mitch",
-          "author": "mitch_fan",
-          "article_id": 20,
-          "created_at": "2021-05-22T14:15:30.000Z",
-          "votes": 40,
-          "comment_count": 7,
-          "article_img_url": "https://example.com/image20.jpg"
+          "title": "The Hidden World of Microbes",
+          "topic": "science",
+          "author": "microbiologist",
+          "article_id": 31,
+          "created_at": "2022-07-20T09:20:00.000Z",
+          "votes": 20,
+          "comment_count": 4,
+          "article_img_url": "https://example.com/image31.jpg",
+          "total_count": 50
         }
       ]
     }
@@ -106,6 +108,31 @@
         "name": "Example User",
         "avatar_url": "https://example.com/avatar/example_user.jpg"
       }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "Retrieves comments for a specific article identified by its unique ID, with added pagination functionality. This ensures efficient handling of large sets of comments. Pagination is controlled through 'limit' and 'p' queries, where 'limit' sets the number of comments per page (defaulting to 10), and 'p' specifies the page number to start from.",
+    "queries": ["limit", "p"],
+    "format": "object",
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 201,
+          "article_id": 50,
+          "username": "nature_lover",
+          "body": "This article on wildlife conservation is eye-opening!",
+          "votes": 5,
+          "created_at": "2023-10-05T11:00:00.000Z"
+        },
+        {
+          "comment_id": 202,
+          "article_id": 50,
+          "username": "eco_warrior",
+          "body": "Great insights on the impact of climate change on biodiversity.",
+          "votes": 8,
+          "created_at": "2023-10-06T09:30:00.000Z"
+        }
+      ]
     }
   },
   "POST /api/articles": {
