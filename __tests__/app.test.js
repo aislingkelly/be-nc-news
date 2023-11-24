@@ -3,7 +3,6 @@ const request = require('supertest');
 const testData = require('../db/data/test-data');
 const seed = require('../db/seeds/seed');
 const db = require('../db/connection');
-const { forEach } = require('../db/data/test-data/articles');
 
 beforeEach(() => {
   return seed(testData);
@@ -444,6 +443,26 @@ describe('/api/articles/:article_id', () => {
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe('invalid vote');
+      });
+  });
+
+  test('DELETE: 204 deletes the specified article and sends no body back', () => {
+    return request(app).delete('/api/articles/1').expect(204);
+  });
+  test('DELETE: 404 sends an appropriate status and error message when given a non-existent id', () => {
+    return request(app)
+      .delete('/api/articles/99999')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('article does not exist');
+      });
+  });
+  test('DELETE: 400 sends an appropriate status and error message when given an invalid id', () => {
+    return request(app)
+      .delete('/api/articles/not-a-article')
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
       });
   });
 });

@@ -218,3 +218,18 @@ GROUP BY inserted_article.author, inserted_article.title, inserted_article.body,
       return result.rows[0];
     });
 };
+
+exports.deleteArticle = (article_id) => {
+  return db
+    .query('DELETE FROM articles WHERE article_id = $1 RETURNING *;', [
+      article_id,
+    ])
+    .then((rows) => {
+      if (rows.rowCount === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `article does not exist`,
+        });
+      }
+    });
+};
