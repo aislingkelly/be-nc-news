@@ -53,6 +53,46 @@ describe('/api/topics', () => {
         expect(body.msg).toBe('path not found');
       });
   });
+
+  test('POST: 201 inserts a new topic to the db and sends the topic back to the client', () => {
+    const newTopic = {
+      slug: 'a new slug',
+      description: 'and description here',
+    };
+    return request(app)
+      .post('/api/topics')
+      .send(newTopic)
+      .expect(201)
+      .then((response) => {
+        const topic = response.body.topic;
+        expect(topic.slug).toBe('a new slug');
+        expect(topic.description).toBe('and description here');
+      });
+  });
+  test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no slug', () => {
+    const newTopic = {
+      description: 'and description here',
+    };
+    return request(app)
+      .post('/api/topics')
+      .send(newTopic)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+  test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no description', () => {
+    const newTopic = {
+      slug: 'a new slug',
+    };
+    return request(app)
+      .post('/api/topics')
+      .send(newTopic)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
 });
 
 describe('/api/articles', () => {
