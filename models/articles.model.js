@@ -91,6 +91,7 @@ FROM row_count `;
   }
 
   queryString += `${order} `;
+
   if (!isNaN(Number(limit))) {
     queryString += `LIMIT ${limit} `;
   } else {
@@ -133,10 +134,8 @@ exports.updateArticle = (article_id, inc_votes) => {
     });
 };
 
-exports.selectCommentsByArticleId = (id) => {
-  return db
-    .query(
-      `SELECT 
+exports.selectCommentsByArticleId = (id, limit = 10, p = 1) => {
+  let queryString = `SELECT 
             comments.comment_id, comments.votes, comments.created_at, comments.author, comments.body, articles.article_id
         FROM 
             articles 
@@ -147,12 +146,24 @@ exports.selectCommentsByArticleId = (id) => {
         WHERE 
             articles.article_id = $1
         ORDER BY  
-            comments.created_at DESC`,
-      [id]
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+            comments.created_at DESC `;
+
+  if (!isNaN(Number(limit))) {
+    queryString += `LIMIT ${limit} `;
+  } else {
+    return Promise.reject({ status: 400, msg: 'bad request' });
+  }
+
+  if (!isNaN(Number(p))) {
+    p = (p - 1) * limit;
+    queryString += `OFFSET ${p} `;
+  } else {
+    return Promise.reject({ status: 400, msg: 'bad request' });
+  }
+
+  return db.query(queryString, [id]).then(({ rows }) => {
+    return rows;
+  });
 };
 
 exports.insertComment = (username, body, article_id) => {
