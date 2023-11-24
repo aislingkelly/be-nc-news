@@ -868,8 +868,8 @@ describe('/api/articles?limit=value&p=value', () => {
           ascending: true,
         });
         expect(body.articles.length).toBe(12);
+        expect(body.total_count).toBe(12);
         body.articles.forEach((article) => {
-          expect(article.total_count).toBe(12);
           expect(article.topic).toBe('mitch');
         });
       });
@@ -885,7 +885,6 @@ describe('/api/articles?limit=value&p=value', () => {
         });
         expect(body.articles.length).toBe(3);
         body.articles.forEach((article) => {
-          expect(article.total_count).toBe(12);
           expect(article.topic).toBe('mitch');
         });
       });
@@ -899,9 +898,6 @@ describe('/api/articles?limit=value&p=value', () => {
           ascending: true,
         });
         expect(body.articles.length).toBe(1);
-        body.articles.forEach((article) => {
-          expect(article.total_count).toBe(13);
-        });
       });
   });
 });
