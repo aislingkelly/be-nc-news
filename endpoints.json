@@ -32,8 +32,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "Fetches an array of articles, allowing for optional query parameters to filter the results by author, topic, sorting order, and sorting criteria. When the 'topic' query is provided, it filters the articles by the specified topic value. The default order is by article creation date, descending",
-    "queries": ["topic"],
+    "description": "Fetches an array of articles, allowing for optional query parameters to filter the results by author, topic, and sorting criteria. The 'sort_by' query allows sorting by any valid article column, defaulting to 'created_at' date. The 'order' query can be 'asc' or 'desc', defaulting to descending order. When the 'topic' query is provided, it filters the articles by the specified topic.",
+    "queries": ["author", "topic", "sort_by", "order"],
     "format": "array",
     "exampleResponse": {
       "articles": [
@@ -60,6 +60,25 @@
       ]
     }
   },
+  "GET /api/users": {
+    "description": "Retrieves an array of all registered users.",
+    "queries": [],
+    "format": "array",
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "user1",
+          "name": "User One",
+          "avatar_url": "https://example.com/avatar1.jpg"
+        },
+        {
+          "username": "user2",
+          "name": "User Two",
+          "avatar_url": "https://example.com/avatar2.jpg"
+        }
+      ]
+    }
+  },
   "GET /api/articles/:id": {
     "description": "Retrieves details of a specific article identified by its unique ID. The response includes article content, metadata, and associated comments.",
     "queries": [],
@@ -77,6 +96,36 @@
       }
     }
   },
+  "GET /api/users/:username": {
+    "description": "Retrieves details of a specific user identified by their username. The response includes the user's username, avatar URL, and name.",
+    "queries": [],
+    "format": "object",
+    "exampleResponse": {
+      "user": {
+        "username": "example_user",
+        "name": "Example User",
+        "avatar_url": "https://example.com/avatar/example_user.jpg"
+      }
+    }
+  },
+  "POST /api/articles": {
+    "description": "Adds a new article to the database. The request body should include the author, title, body, topic, and an optional article image URL. Responds with the newly added article, including all provided properties as well as generated properties like article_id, votes, created_at, and a default comment count.",
+    "queries": [],
+    "format": "object",
+    "exampleResponse": {
+      "article": {
+        "author": "example_author",
+        "title": "Example Title",
+        "body": "Example article body content...",
+        "topic": "example_topic",
+        "article_id": 123,
+        "created_at": "2023-11-24T12:00:00.000Z",
+        "votes": 0,
+        "comment_count": 0,
+        "article_img_url": "https://example.com/image.jpg"
+      }
+    }
+  },
   "POST /api/articles/:article_id/comments": {
     "description": "Adds a new comment to a specific article identified by its unique ID.",
     "queries": [],
@@ -86,9 +135,7 @@
         "comment_id": 101,
         "article_id": 5,
         "username": "user_example",
-
         "body": "This article provides valuable insights!",
-
         "votes": 0,
         "created_at": "2023-11-21T09:00:00.000Z"
       }
@@ -111,23 +158,19 @@
       }
     }
   },
-  "GET /api/users": {
-    "description": "Retrieves an array of all registered users.",
+  "PATCH /api/comments/:comment_id": {
+    "description": "Updates the vote count of a specific comment identified by its unique comment ID. The request body should include an object with the 'inc_votes' property to indicate how much the votes should be incremented or decremented.",
     "queries": [],
-    "format": "array",
+    "format": "object",
     "exampleResponse": {
-      "users": [
-        {
-          "username": "user1",
-          "name": "User One",
-          "avatar_url": "https://example.com/avatar1.jpg"
-        },
-        {
-          "username": "user2",
-          "name": "User Two",
-          "avatar_url": "https://example.com/avatar2.jpg"
-        }
-      ]
+      "comment": {
+        "comment_id": 101,
+        "article_id": 5,
+        "username": "user_example",
+        "body": "This article provides valuable insights!",
+        "votes": 10,
+        "created_at": "2023-11-21T09:00:00.000Z"
+      }
     }
   }
 }
