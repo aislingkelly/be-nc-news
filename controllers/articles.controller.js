@@ -4,6 +4,7 @@ const {
   updateArticle,
   selectCommentsByArticleId,
   insertComment,
+  insertArticle,
 } = require('../models/articles.model');
 
 const { checkTopicExists } = require('../models/topics.model');
@@ -73,34 +74,11 @@ exports.postCommentsByArticleId = (req, res, next) => {
     .catch(next);
 };
 
-exports.getCommentsByArticleId = (req, res, next) => {
-  const { article_id } = req.params;
-  const commentPromises = [
-    selectArticleById(article_id),
-    selectCommentsByArticleId(article_id),
-  ];
-
-  Promise.all(commentPromises)
-    .then((resolvedPromises) => {
-      const comments = resolvedPromises[1];
-      res.status(200).send({ comments });
-    })
-    .catch(next);
-};
-
-exports.postCommentsByArticleId = (req, res, next) => {
-  const { article_id } = req.params;
-  const { username, body } = req.body;
-
-  const commentPromises = [
-    selectArticleById(article_id),
-    insertComment(username, body, article_id),
-  ];
-
-  Promise.all(commentPromises)
-    .then((resolvedPromises) => {
-      const comment = resolvedPromises[1];
-      res.status(201).send({ comment });
+exports.postArticle = (req, res, next) => {
+  const { author, title, body, topic, article_img_url } = req.body;
+  insertArticle(author, title, body, topic, article_img_url)
+    .then((article) => {
+      res.status(201).send({ article });
     })
     .catch(next);
 };

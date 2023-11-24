@@ -148,3 +148,42 @@ exports.insertComment = (username, body, article_id) => {
       return result.rows[0];
     });
 };
+
+exports.insertArticle = (
+  author,
+  title,
+  body,
+  topic,
+  article_img_url = 'https://placehold.co/700x700'
+) => {
+  if (!body || !author || !topic || !title) {
+    return Promise.reject({ status: 400, msg: 'bad request' });
+  }
+  return db
+    .query(
+      `WITH inserted_article AS (
+    INSERT INTO articles (body, title, topic, author, article_img_url)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *
+)
+SELECT
+    inserted_article.author,
+    inserted_article.title,
+    inserted_article.body,
+    inserted_article.article_id,
+    inserted_article.topic,
+    inserted_article.created_at,
+    inserted_article.votes,
+    inserted_article.article_img_url,
+    CAST(COUNT(comments.comment_id) AS INTEGER) AS comment_count
+FROM
+    inserted_article
+LEFT JOIN comments ON inserted_article.article_id = comments.article_id
+GROUP BY inserted_article.author, inserted_article.title, inserted_article.body, inserted_article.article_id, inserted_article.topic, inserted_article.created_at, inserted_article.votes, inserted_article.article_img_url;
+`,
+      [body, title, topic, author, article_img_url]
+    )
+    .then((result) => {
+      return result.rows[0];
+    });
+};

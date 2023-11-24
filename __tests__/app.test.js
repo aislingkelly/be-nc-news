@@ -96,6 +96,169 @@ describe('/api/articles', () => {
         });
       });
   });
+  test('POST: 201 inserts a new article to the db and sends the article back to the client', () => {
+    const newArticle = {
+      author: 'lurker',
+      title: 'A great title',
+      body: 'This is the body',
+      topic: 'cats',
+      article_img_url:
+        'https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700',
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(201)
+      .then((response) => {
+        const article = response.body.article;
+        expect(article.article_id).toBe(14);
+        expect(article.body).toBe('This is the body');
+        expect(article.author).toBe('lurker');
+      });
+  });
+  test('POST: 201 inserts a new article with all the correct fields', () => {
+    const newArticle = {
+      author: 'lurker',
+      title: 'A great title',
+      body: 'This is the body',
+      topic: 'cats',
+      article_img_url:
+        'https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700',
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(201)
+      .then((response) => {
+        const article = response.body.article;
+        expect(article).toMatchObject({
+          article_id: expect.any(Number),
+          votes: expect.any(Number),
+          comment_count: expect.any(Number),
+          created_at: expect.any(String),
+          author: expect.any(String),
+          title: expect.any(String),
+          body: expect.any(String),
+          topic: expect.any(String),
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+  test('POST: 201 inserts a new article with all the correct fields and default image', () => {
+    const newArticle = {
+      author: 'lurker',
+      title: 'A great title',
+      body: 'This is the body',
+      topic: 'cats',
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(201)
+      .then((response) => {
+        const article = response.body.article;
+        expect(article.article_img_url).toBe('https://placehold.co/700x700');
+      });
+  });
+
+  test('POST: 404 sends an appropriate status and error message when author does not exist', () => {
+    const newArticle = {
+      author: 'not_today_buddy',
+      title: 'A great title',
+      body: 'This is the body',
+      topic: 'cats',
+      article_img_url:
+        'https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700',
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+  test('POST: 404 sends an appropriate status and error message when topic does not exist', () => {
+    const newArticle = {
+      author: 'not_today_buddy',
+      title: 'A great title',
+      body: 'This is the body',
+      topic: 'banana',
+      article_img_url:
+        'https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700',
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+  test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no body', () => {
+    const newArticle = {
+      author: 'lurker',
+      title: 'A great title',
+      topic: 'cats',
+      article_img_url:
+        'https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700',
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+  test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no author', () => {
+    const newArticle = {
+      body: 'the body of the article',
+      title: 'A great title',
+      topic: 'cats',
+      article_img_url:
+        'https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700',
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+  test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no title', () => {
+    const newArticle = {
+      body: 'the body of the article',
+      author: 'lurker',
+      topic: 'cats',
+      article_img_url:
+        'https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700',
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
+  test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no topic', () => {
+    const newArticle = {
+      body: 'the body of the article',
+      author: 'lurker',
+      title: 'a thing about cats',
+      article_img_url:
+        'https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700',
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('bad request');
+      });
+  });
 });
 describe('/api/articles?topic', () => {
   test('GET 200: responds only with articles of a given topic', () => {
@@ -382,7 +545,7 @@ describe('/api/articles/:article_id/comments', () => {
       .send(newComment)
       .expect(400)
       .then((response) => {
-        expect(response.body.msg).toBe('user does not exist');
+        expect(response.body.msg).toBe('bad request');
       });
   });
   test('POST: 400 sends an appropriate status and error message when provided with an incomplete request - no comment body', () => {
