@@ -3,6 +3,7 @@ const request = require('supertest');
 const testData = require('../db/data/test-data');
 const seed = require('../db/seeds/seed');
 const db = require('../db/connection');
+const { forEach } = require('../db/data/test-data/articles');
 
 beforeEach(() => {
   return seed(testData);
@@ -61,7 +62,7 @@ describe('/api/articles', () => {
       .expect(200)
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
-        expect(body.articles.length).toBe(13);
+        expect(body.articles.length).toBe(10);
       });
   });
 
@@ -269,7 +270,7 @@ describe('/api/articles?topic', () => {
         body.articles.forEach((article) => {
           expect(article.topic).toBe('mitch');
         });
-        expect(body.articles.length).toBe(12);
+        expect(body.articles.length).toBe(10);
       });
   });
   test('GET 404: sends an error when topic does not exists', () => {
@@ -738,6 +739,107 @@ describe('/api/articles?sort_by=value&order=value', () => {
       });
   });
 });
+
+/////// Limit and page
+describe('/api/articles?limit=value&p=value', () => {
+  test('GET: 200 sends an array articles limited to limit', () => {
+    return request(app)
+      .get('/api/articles?limit=6')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(6);
+      });
+  });
+
+  test('GET: 400 bad request if limit is not a number', () => {
+    return request(app)
+      .get('/api/articles?limit=banana')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request');
+      });
+  });
+  test('GET: 400 bad request if p is not a number', () => {
+    return request(app)
+      .get('/api/articles?p=banana')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request');
+      });
+  });
+  test('GET: 200 sends an array articles limited to limit and on page p', () => {
+    return request(app)
+      .get('/api/articles?limit=3&p=4')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(3);
+      });
+  });
+  test('GET: 200 sends an array articles limited to limit and on page p - the last page has fewer results', () => {
+    return request(app)
+      .get('/api/articles?limit=3&p=5')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(1);
+      });
+  });
+
+  test('GET: 200 ALL the things', () => {
+    return request(app)
+      .get('/api/articles?topic=mitch&order=asc&sort_by=votes&limit=15&p=1')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('votes', {
+          ascending: true,
+        });
+        expect(body.articles.length).toBe(12);
+        body.articles.forEach((article) => {
+          expect(article.total_count).toBe(12);
+          expect(article.topic).toBe('mitch');
+        });
+      });
+  });
+
+  test('GET: 200 ALL the things with correct pagination', () => {
+    return request(app)
+      .get('/api/articles?topic=mitch&order=asc&sort_by=votes&limit=3&p=3')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('votes', {
+          ascending: true,
+        });
+        expect(body.articles.length).toBe(3);
+        body.articles.forEach((article) => {
+          expect(article.total_count).toBe(12);
+          expect(article.topic).toBe('mitch');
+        });
+      });
+  });
+  test('GET: 200 ALL the things with correct pagination - last page has fewer articles', () => {
+    return request(app)
+      .get('/api/articles?order=asc&sort_by=votes&limit=4&p=4')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('votes', {
+          ascending: true,
+        });
+        expect(body.articles.length).toBe(1);
+        body.articles.forEach((article) => {
+          expect(article.total_count).toBe(13);
+        });
+      });
+  });
+
+  // test('GET: 400 bad request if limit is not a number', () => {
+  //   return request(app)
+  //     .get('/api/articles?limit=banana')
+  //     .expect(400)
+  //     .then(({ body }) => {
+  //       expect(body.msg).toBe('bad request');
+  //     });
+});
+
+////////////////////// Limit and page
 
 describe('/api/comments/:comment_id', () => {
   test('PATCH: 200 updates the requested comment by increasing votes', () => {
