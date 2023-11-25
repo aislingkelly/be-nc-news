@@ -102,6 +102,7 @@ describe('/api/articles', () => {
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
         expect(body.articles.length).toBe(10);
+        expect(body.total_count).toEqual(13);
       });
   });
 
@@ -326,6 +327,7 @@ describe('/api/articles?topic', () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.articles).toEqual([]);
+        expect(body.total_count).toEqual(0);
       });
   });
 });
@@ -887,6 +889,18 @@ describe('/api/articles?limit=value&p=value', () => {
         body.articles.forEach((article) => {
           expect(article.topic).toBe('mitch');
         });
+      });
+  });
+  test('GET: 200 ALL the things but topic has no things', () => {
+    return request(app)
+      .get('/api/articles?topic=paper&order=asc&sort_by=votes&limit=3&p=3')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('votes', {
+          ascending: true,
+        });
+        expect(body.articles.length).toBe(0);
+        body.articles.forEach((article) => {});
       });
   });
   test('GET: 200 ALL the things with correct pagination - last page has fewer articles', () => {
