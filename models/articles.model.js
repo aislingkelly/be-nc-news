@@ -159,7 +159,7 @@ exports.deleteArticle = (article_id) => {
 exports.selectArticles = (
   topic,
   order = 'desc',
-  sort_by,
+  sort_by = 'created_at',
   limit = 10,
   p = 1
 ) => {
@@ -182,7 +182,7 @@ exports.selectArticles = (
 
   p = (p - 1) * limit;
 
-  let countQuery = `SELECT COUNT(*) AS total_count FROM articles`;
+  let countQuery = `SELECT COUNT(article_id) AS total_count FROM articles`;
   const values = [];
 
   if (topic) {
@@ -193,21 +193,14 @@ exports.selectArticles = (
   return db.query(countQuery, values).then((countResult) => {
     const totalCount = countResult.rows[0].total_count;
 
-    let articlesQuery = `SELECT author, title, article_id, topic, created_at, votes, article_img_url, 
+    let articlesQuery = `SELECT author, title, article_id, topic, created_at, votes, article_img_url,
       CAST((SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) AS comment_count
       FROM articles`;
 
     if (topic) {
       articlesQuery += ` WHERE topic = $1`;
     }
-
-    if (sort_by) {
-      articlesQuery += ` ORDER BY ${sort_by} ${order}`;
-    } else {
-      articlesQuery += ` ORDER BY created_at ${order}`;
-    }
-
-    articlesQuery += ` LIMIT ${limit} OFFSET ${p}`;
+    articlesQuery += ` ORDER BY ${sort_by} ${order} LIMIT ${limit} OFFSET ${p} `;
 
     return db.query(articlesQuery, values).then((articlesResult) => {
       return {

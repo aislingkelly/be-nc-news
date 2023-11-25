@@ -14,39 +14,18 @@ const { checkTopicExists } = require('../models/topics.model');
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, topic, limit, p } = req.query;
 
-  // Initialize an array with the selectArticles promise
   const articlePromises = [selectArticles(topic, order, sort_by, limit, p)];
 
-  // If a topic is specified, add the checkTopicExists promise to the array
   if (topic) {
     articlePromises.push(checkTopicExists(topic));
   }
-
   Promise.all(articlePromises)
     .then((resolvedPromises) => {
-      // Extract articles and total count from the first promise's resolution
       const { articles, total_count } = resolvedPromises[0];
-
-      // If topic was checked, it will be in the second promise, which we can ignore if it resolved successfully
       res.status(200).send({ articles, total_count });
     })
-    .catch(next); // Error handling for either promise failing
+    .catch(next);
 };
-
-// exports.getArticles = (req, res, next) => {
-//   const { sort_by, order, topic, limit, p } = req.query;
-//   const articlePromises = [selectArticles(topic, order, sort_by, limit, p)];
-//   if (topic) {
-//     articlePromises.push(checkTopicExists(topic));
-//   }
-//   Promise.all(articlePromises)
-//     .then((resolvedPromises) => {
-//       const articles = resolvedPromises[0];
-
-//       res.status(200).send({ articles });
-//     })
-//     .catch(next);
-// };
 
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
