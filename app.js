@@ -1,8 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 
 // Import the apiRouter
 const apiRouter = require('./routes/api-router');
+
+app.use(cors());
 
 const {
   handleCustomErrors,
